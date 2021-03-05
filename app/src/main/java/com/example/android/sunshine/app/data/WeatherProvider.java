@@ -15,7 +15,6 @@
  */
 package com.example.android.sunshine.app.data;
 
-import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -23,6 +22,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
 
 public class WeatherProvider extends ContentProvider {
 
@@ -114,6 +115,7 @@ public class WeatherProvider extends ContentProvider {
         and LOCATION integer constants defined above.  You can test this by uncommenting the
         testUriMatcher test within TestUriMatcher.
      */
+    @NonNull
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -281,7 +283,7 @@ public class WeatherProvider extends ContentProvider {
         return rowsDeleted;
     }
 
-    private void normalizeDate(ContentValues values) {
+    private void normalizeDate(@NonNull ContentValues values) {
         // normalize the date value
         if (values.containsKey(WeatherContract.WeatherEntry.COLUMN_DATE)) {
             long dateValue = values.getAsLong(WeatherContract.WeatherEntry.COLUMN_DATE);
@@ -319,34 +321,31 @@ public class WeatherProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case WEATHER:
-                db.beginTransaction();
-                int returnCount = 0;
-                try {
-                    for (ContentValues value : values) {
-                        normalizeDate(value);
-                        long _id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
-                            returnCount++;
-                        }
+        if (match == WEATHER){
+            db.beginTransaction();
+            int returnCount = 0;
+            try {
+                for (ContentValues value : values) {
+                    normalizeDate(value);
+                    long _id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
+                    if (_id != -1) {
+                        returnCount++;
                     }
-                    db.setTransactionSuccessful();
-                } finally {
-                    db.endTransaction();
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
-                return returnCount;
-            default:
-                return super.bulkInsert(uri, values);
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+            getContext().getContentResolver().notifyChange(uri, null);
+            return returnCount;
         }
+        return super.bulkInsert(uri, values);
     }
 
     // You do not need to call this method. This is a method specifically to assist the testing
     // framework in running smoothly. You can read more at:
     // http://developer.android.com/reference/android/content/ContentProvider.html#shutdown()
     @Override
-    @TargetApi(11)
     public void shutdown() {
         mOpenHelper.close();
         super.shutdown();

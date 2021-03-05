@@ -2,12 +2,14 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cursoradapter.widget.CursorAdapter;
 
 /**
  * {@link ForecastAdapter} exposes a list of weather forecasts
@@ -33,11 +35,11 @@ public class ForecastAdapter extends CursorAdapter {
         public final TextView lowTempView;
 
         public ViewHolder(View view) {
-            iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-            dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
-            descriptionView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-            highTempView = (TextView) view.findViewById(R.id.list_item_high_textview);
-            lowTempView = (TextView) view.findViewById(R.id.list_item_low_textview);
+            iconView = view.findViewById(R.id.list_item_icon);
+            dateView = view.findViewById(R.id.list_item_date_textview);
+            descriptionView = view.findViewById(R.id.list_item_forecast_textview);
+            highTempView = view.findViewById(R.id.list_item_high_textview);
+            lowTempView = view.findViewById(R.id.list_item_low_textview);
         }
     }
 
@@ -70,7 +72,7 @@ public class ForecastAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(@NonNull View view, Context context, @NonNull Cursor cursor) {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 

@@ -19,7 +19,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
-import android.text.format.Time;
+
+import java.util.Calendar;
 
 /**
  * Defines table and column names for the weather database.
@@ -48,10 +49,12 @@ public class WeatherContract {
     // the database to the start of the the Julian day at UTC.
     public static long normalizeDate(long startDate) {
         // normalize the start date to the beginning of the (UTC) day
-        Time time = new Time();
-        time.set(startDate);
-        int julianDay = Time.getJulianDay(startDate, time.gmtoff);
-        return time.setJulianDay(julianDay);
+        Calendar thisCalendar = Calendar.getInstance();
+        thisCalendar.setTimeInMillis(startDate);
+        thisCalendar.set(Calendar.HOUR, 0);
+        thisCalendar.set(Calendar.MINUTE, 0);
+        thisCalendar.set(Calendar.SECOND, 0);
+        return thisCalendar.getTimeInMillis();
     }
 
     /* Inner class that defines the table contents of the location table */
